@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  postal:
+    image: ghcr.io/postalserver/postal:latest
+    container_name: postal
+    depends_on:
+      - mariadb
+      - rabbitmq
+    volumes:
+      - ./config:/config
+    ports:
+      - "25:25"
+      - "5000:5000"
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3.11
+    container_name: postal-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=postal
+      - RABBITMQ_DEFAULT_PASS=postal
+      - RABBITMQ_DEFAULT_VHOST=postal
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    restart: always
+
+  mariadb:
+    image: mariadb:10.6
+    container_name: postal-mariadb
+    environment:
+      - MARIADB_DATABASE=postal
+      - MARIADB_ROOT_PASSWORD=postal
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    restart: always
